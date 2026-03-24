@@ -5,51 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assistant de Lecture Biblique</title>
     <style>
-        /* Ici c'est le design (CSS) : on divise l'écran en deux */
-        body { 
-            margin: 0; 
-            display: flex; 
-            height: 100vh; /* Prend 100% de la hauteur de l'écran */
-            font-family: 'Georgia', serif; /* Une police agréable pour la lecture */
-            color: #333;
-        }
-        #bible-container { 
-            width: 50%; 
-            padding: 40px; 
-            overflow-y: auto; /* Permet de scroller */
-            background-color: #fdfdfd; 
-            border-right: 1px solid #ccc; /* La ligne de séparation au milieu */
-            box-sizing: border-box;
-        }
-        #notes-container { 
-            width: 50%; 
-            padding: 40px; 
-            overflow-y: auto; 
-            background-color: #ffffff; 
-            box-sizing: border-box;
-        }
-        textarea { 
-            width: 100%; 
-            height: 100%; 
-            border: none; 
-            resize: none; 
-            font-size: 18px; 
-            font-family: 'Arial', sans-serif; 
-            outline: none; 
-            line-height: 1.6;
-        }
-        .verset { 
-            margin-bottom: 15px; 
-            line-height: 1.6; 
-            font-size: 18px;
-            padding: 5px; 
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .verset:hover { 
-            background-color: #f0f0f0; /* Petit effet au survol de la souris */
-        }
+        body { margin: 0; display: flex; height: 100vh; font-family: 'Georgia', serif; color: #333; }
+        #bible-container { width: 50%; padding: 40px; overflow-y: auto; background-color: #fdfdfd; border-right: 1px solid #ccc; box-sizing: border-box; }
+        #notes-container { width: 50%; padding: 40px; overflow-y: auto; background-color: #ffffff; box-sizing: border-box; }
+        textarea { width: 100%; height: 100%; border: none; resize: none; font-size: 18px; font-family: 'Arial', sans-serif; outline: none; line-height: 1.6; }
+        .verset { margin-bottom: 15px; line-height: 1.6; font-size: 18px; padding: 5px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; }
+        .verset:hover { background-color: #e8f0fe; }
         h1 { text-align: center; font-size: 28px; }
     </style>
 </head>
@@ -57,15 +18,47 @@
 
     <div id="bible-container">
         <h1>La Genèse - Chapitre 1</h1>
-        <div class="verset"><strong>1</strong> Au commencement, Dieu créa les cieux et la terre.</div>
-        <div class="verset"><strong>2</strong> La terre était informe et vide: il y avait des ténèbres à la surface de l'abîme, et l'esprit de Dieu se mouvait au-dessus des eaux.</div>
-        <div class="verset"><strong>3</strong> Dieu dit: Que la lumière soit! Et la lumière fut.</div>
-        <div class="verset"><strong>4</strong> Dieu vit que la lumière était bonne; et Dieu sépara la lumière d'avec les ténèbres.</div>
+        <div class="verset" data-ref="Genèse 1:1"><strong>1</strong> Au commencement, Dieu créa les cieux et la terre.</div>
+        <div class="verset" data-ref="Genèse 1:2"><strong>2</strong> La terre était informe et vide: il y avait des ténèbres à la surface de l'abîme, et l'esprit de Dieu se mouvait au-dessus des eaux.</div>
+        <div class="verset" data-ref="Genèse 1:3"><strong>3</strong> Dieu dit: Que la lumière soit! Et la lumière fut.</div>
+        <div class="verset" data-ref="Genèse 1:4"><strong>4</strong> Dieu vit que la lumière était bonne; et Dieu sépara la lumière d'avec les ténèbres.</div>
     </div>
 
     <div id="notes-container">
-        <textarea placeholder="Vos notes et commentaires apparaîtront ici..."></textarea>
+        <textarea id="editeur-notes" placeholder="Vos notes et commentaires apparaîtront ici... Cliquez sur un verset pour commencer !"></textarea>
     </div>
+
+    <script>
+        const notesArea = document.getElementById('editeur-notes');
+        const versets = document.querySelectorAll('.verset');
+
+        // 1. Quand la page charge, on va chercher les notes sauvegardées sur le PC
+        const notesSauvegardees = localStorage.getItem('mes_notes_bibliques');
+        if (notesSauvegardees) {
+            notesArea.value = notesSauvegardees;
+        }
+
+        // 2. Dès qu'on tape une lettre, on sauvegarde silencieusement
+        notesArea.addEventListener('input', function() {
+            localStorage.setItem('mes_notes_bibliques', this.value);
+        });
+
+        // 3. Quand on clique sur un verset, on l'ajoute dans les notes
+        versets.forEach(verset => {
+            verset.addEventListener('click', function() {
+                const reference = this.getAttribute('data-ref');
+                
+                // On ajoute un saut de ligne et la référence du verset
+                notesArea.value += `\n\n[${reference}] : `;
+                
+                // On met le curseur à la fin pour que tu puisses taper direct
+                notesArea.focus(); 
+                
+                // On sauvegarde ce nouvel ajout
+                localStorage.setItem('mes_notes_bibliques', notesArea.value);
+            });
+        });
+    </script>
 
 </body>
 </html>
